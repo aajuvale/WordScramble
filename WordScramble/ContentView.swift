@@ -8,29 +8,51 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State
+    private var usedWords = [String]()
+
+    @State
+    private var rootWord = ""
+
+    @State
+    private var newWord = ""
 
     var body: some View {
-        
+        NavigationStack {
+            List {
+                Section {
+                    TextField("Enter your word", text: $newWord)
+                        .textInputAutocapitalization(.never)
+                }
+
+                Section {
+                    ForEach(usedWords, id: \.self) { word in
+                        HStack {
+                            Image(systemName: "\(word.count).circle")
+                            Text(word)
+                        }
+                    }
+                }
+            }
+            .navigationTitle(rootWord)
+            .onSubmit {
+                addNewWord()
+            }
+        }
     }
 
-    func testStrings() {
-//        let input = """
-//        a
-//        b
-//        c
-//        """
-//        let letters = input.components(separatedBy: "\n")
-//        let letter = letters.randomElement()
-//        let trimmed = letter?.trimmingCharacters(in: .whitespacesAndNewlines)
+    func addNewWord() {
+        let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
 
-        let word = "swift"
-        let checker = UITextChecker()
+        guard answer.count > 0 else { return }
 
-        let range = NSRange(location: 0, length: word.utf16.count)
-        let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
+        // extra validation
 
-        let allGood = misspelledRange.location == NSNotFound
+        withAnimation {
+            usedWords.insert(answer, at: 0)
+        }
 
+        newWord = ""
     }
 }
 
